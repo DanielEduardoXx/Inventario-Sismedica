@@ -1,26 +1,21 @@
 import Swal from "sweetalert2";
 
-
-export const swalEliminar = ({ children }) => {
+export const swalEliminar = (id, entidad, eliminarFila) => {
     Swal.fire({
         title: '¡Espera Un Momento!',
-        text: children,
-        icon: 'warning', // Puedes usar 'error', 'warning', 'info' o 'question'success
+        text: `¿Seguro que quieres eliminar ${entidad} con identificador: ${id}?`,
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Sí, eliminarlo!',
+        confirmButtonText: 'Sí, eliminar!',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
-        if (result.isConfirmed) {
-
-            console.log('Boton')
-            // Swal.fire(
-            //     'Eliminado!',
-            //     'Tu archivo ha sido eliminado.',
-            //     'success'
-            // )
+        if (result.isConfirmed && typeof eliminarFila === "function") {  // Verifica que eliminarFila sea una función
+            eliminarFila(id);  // Ejecuta la función solo si es válida
+        } else {
+            console.error("eliminarFila no es una función válida", eliminarFila); // Error de consola si no es función
         }
     });
-}
+};
 
 // Swal.fire({
 //     title: '¿Estás seguro?',
