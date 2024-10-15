@@ -5,14 +5,13 @@ require_once('Database.class.php');
 class Regional
 {
 
-    public static function create_regional($id, $nombre)
+    public static function create_regional($nombre)
     {
         $database = new DataBase;
         $conn = $database->getConnection();
 
-        $stmt = $conn->prepare('INSERT INTO regional (id, nombre) VALUES (:id, :nombre)');
+        $stmt = $conn->prepare('INSERT INTO regional ( nombre) VALUES (:nombre)');
 
-        $stmt->bindParam("id", $id);
         $stmt->bindParam("nombre", $nombre);
 
         if ($stmt->execute()) {
@@ -34,7 +33,7 @@ class Regional
         if ($stmt->execute()) {
             header('HTTP/1.1 200 regional Eliminado Correctamente');
         } else {
-            header('HTTP/1.1 200 regional Eliminado Correctamente');
+            header('HTTP/1.1 500 regional no Eliminado Correctamente');
         }
     }
 
@@ -46,10 +45,11 @@ class Regional
 
         if ($stmt->execute()) {
             $result = $stmt->fetchAll();
-            echo json_encode($result);
+  
             header('HTTP/1.1 200 regional Eliminado Correctamente');
+            echo json_encode($result);
         } else {
-            header('HTTP/1.1 200 regional No Fue Eliminado Correctamente');
+            header('HTTP/1.1 500 regional No Fue Eliminado Correctamente');
         }
     }
 
@@ -65,7 +65,7 @@ class Regional
         if ($stmt->execute()) {
             header('HTTP/1.1 200 regional Actualizado Correctamente');
         } else {
-            header('HTTP/1.1 200 regional No Fue Actualizado Correctamente');
+            header('HTTP/1.1 500 regional No Fue Actualizado Correctamente');
         }
     }
 }

@@ -59,8 +59,8 @@ class Element
 
         if ($stmt->execute()) {
             $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC); // Asegúrate de obtener un array asociativo
-            echo json_encode($resultado);
             header('HTTP/1.1 201 Elemento Listado correctamente');
+            echo json_encode($resultado);
         } else {
             header('HTTP/1.1 500 Elemento no Listado correctamente');
         }
@@ -107,8 +107,9 @@ class Element
 
         if ($stmt->execute()) {
             $resultado = $stmt->fetchAll();
-            echo json_encode($resultado);
+        
             header('HTTP/1.1 201 Elemento Listado correctamente');
+            echo json_encode($resultado);
         } else {
             header('HTTP/1.1 500 Elemento no Listado correctamente');
         }
@@ -129,8 +130,9 @@ class Element
 
         if ($stmt->execute()) {
             $resultado = $stmt->fetchAll();
-            echo json_encode($resultado);
+
             header('HTTP/1.1 201 Elemento Listado correctamente');
+            echo json_encode($resultado);
         } else {
             header('HTTP/1.1 500 Elemento no Listado correctamente');
         }
