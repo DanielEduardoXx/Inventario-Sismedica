@@ -11,7 +11,7 @@ const useGetAreas = () => {
 
     useEffect(() => {
 
-        const fetchCargos = async () => {
+        const fetchAreas = async () => {
             try {
                 const result = await getAllAreas();
                 setData(result)
@@ -24,7 +24,7 @@ const useGetAreas = () => {
                 setLoading(false)
             }
         };
-        fetchCargos();
+        fetchAreas();
      }, []);
 
      return {data, loading, error};
