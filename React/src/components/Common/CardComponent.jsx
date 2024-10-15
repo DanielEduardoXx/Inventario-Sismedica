@@ -5,7 +5,7 @@ import { useState } from 'react';
 import CardModal from './CardModal';
 import { SearchComponent } from '../Search';
 
-function CardComponent({ titleForm, title, children, childrenModal }) {
+function CardComponent({ titleForm, title, children, childrenModal, showAction = true }) {
 
     const [open, setOpen] = useState(false);
     const [selectFormulario, setSelectFormulario] = useState(null)
@@ -28,7 +28,9 @@ function CardComponent({ titleForm, title, children, childrenModal }) {
                     title={title}
                     sx={{ backgroundColor: '#f3f4f7' }}
                     action={
-                        <BotonSuccess mensaje="Agregar" onClick={() => handleOpen('form1')} />
+                        showAction && (
+                            <BotonSuccess mensaje="Agregar" onClick={() => handleOpen('form1')} />
+                        )
                     }
                 />
 
@@ -50,6 +52,7 @@ function CardComponent({ titleForm, title, children, childrenModal }) {
 
                 />
 
+                {/* Contenido dentro del card */}
                 <CardContent>
                     {children}
                 </CardContent>

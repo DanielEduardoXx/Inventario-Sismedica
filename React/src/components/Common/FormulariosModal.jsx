@@ -1,19 +1,28 @@
 
-import { FormControl, TextField, Typography, Box } from '@mui/material';
+import { FormControl, TextField, Typography, Box, Select, MenuItem, InputLabel } from '@mui/material';
 import { useState, useEffect } from 'react';
+
+//Hook Create
 import useCreateElemento from '../../hooks/elementos/useCreateElemento';
 import useCreateUsuario from '../../hooks/usuarios/useCreateUsuario';
-import Alert from '@mui/material/Alert';
+import useCreateCargo from '../../hooks/datosSismedica/cargos/useCreateCargo';
+import useCreateArea from '../../hooks/datosSismedica/areas/useCreateArea';
+import useCreateRegional from '../../hooks/datosSismedica/regional/useCreateRegional';
 
+//Hook Get
+import useGetCargos from '../../hooks/datosSismedica/cargos/useGetCargos';
+import useGetRegional from '../../hooks/datosSismedica/regional/useGetRegional';
+import useGetAreas from '../../hooks/datosSismedica/areas/useGetAreas';
+
+import Alert from '@mui/material/Alert';
 
 // Formulario Regional
 
 export const FormRegional = () => {
     const [formData, setFormData] = useState({
-        id_regional: '',
         nombre: '',
     })
-    const { data, loading, error, nuevoUser } = useCreateUsuario();
+    const { data, loading, error, nueva_regional } = useCreateRegional();
     const [message, setMessage] = useState(null);
 
     const handleChange = (e) => {
@@ -25,7 +34,11 @@ export const FormRegional = () => {
         event.preventDefault();
 
         try {
-            await nuevoUser(formData);
+
+            // Excluimos el `id` al enviar los datos
+            const { id, ...dataToSend } = formData;
+
+            await nueva_regional(dataToSend);
             setMessage({ text: 'Regional creado exitosamente', type: 'error' })
 
         } catch (error) {
@@ -50,7 +63,7 @@ export const FormRegional = () => {
 
         <>
             <form onSubmit={handleSubmit}>
-                <FormControl sx={{ display: 'flex' }} >
+                <FormControl sx={{ display: 'flex', flexDirection: 'column' }} >
                     <Box>
                         <Typography variant="h6" align="center">
                             Información Personal
@@ -58,8 +71,6 @@ export const FormRegional = () => {
                         <Box sx={{ display: 'flex' }}>
 
                             <Box>
-                                <TextField id="id_regional" label="id_regional" variant="outlined" onChange={handleChange} value={formData.id_regional} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
-
                                 <TextField id="nombre" label="nombre" variant="outlined" onChange={handleChange} value={formData.nombre} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
                             </Box>
 
@@ -73,44 +84,52 @@ export const FormRegional = () => {
                     </button>
 
                     {message && (
-                        <Alert
-                            severity={message.severity}
-                            sx={{ mt: 2 }}
-                        >
+                        <Alert severity={message.type} sx={{ mt: 2 }}>
                             {message.text}
                         </Alert>
                     )}
                 </FormControl>
             </form>
         </>
-    )    
+    )
 }
 
 
 //Formulario Areas
 
 export const FormAreas = () => {
+    const { data: regionales, loading: loadingRegionales } = useGetRegional();
+
     const [formData, setFormData] = useState({
-        id_area: '',
         nombre: '',
+        id_regional: ''
     })
-    const { data, loading, error, nuevoUser } = useCreateUsuario();
+    const { data, loading, error, nueva_area } = useCreateArea();
     const [message, setMessage] = useState(null);
 
     const handleChange = (e) => {
-        const { id, value } = e.target;
-        setFormData({ ...formData, [id]: value })
-    }
+        const { id, value, name } = e.target;
+
+        // Si el campo es 'id_regional', forzamos que sea un número
+        if (id === 'id_regional' && isNaN(value)) {
+            return;  // Evitar que se establezca un valor no numérico
+        }
+
+        setFormData({ ...formData, [id || name]: value });
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
         try {
-            await nuevoUser(formData);
-            setMessage({ text: 'Area creado exitosamente', type: 'error' })
+            // Excluimos el `id` al enviar los datos
+            const { id, ...dataToSend } = formData;
 
+            console.log('Datos a enviar:', dataToSend);  // Verificar los datos enviados
+
+            await nueva_area(dataToSend);  // Enviar datos sin `id`
+            setMessage({ text: 'Área creada exitosamente', type: 'success' });
         } catch (error) {
-            console.error("error0", error)
+            console.error("Error al crear el área:", error);
             setMessage({ text: 'Ups! Algo salió mal', type: 'error' });
         }
     }
@@ -139,12 +158,19 @@ export const FormAreas = () => {
                         <Box sx={{ display: 'flex' }}>
 
                             <Box>
-                                <TextField id="id_area" label="id_area" variant="outlined" onChange={handleChange} value={formData.id_regional} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
+                                <TextField id="nombre" label="nombre" variant="outlined" onChange={handleChange} value={formData.nombre} sx={{ minWidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
 
-                                <TextField id="nombre" label="nombre" variant="outlined" onChange={handleChange} value={formData.nombre} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
+                                <FormControl fullWidth>
+                                    <InputLabel id="regional-label">Regional</InputLabel>
+                                    <Select labelId="regional-label" name="id_regional" onChange={handleChange} value={formData.id_regional}>
+                                        {regionales.map((regional) => (
+                                            <MenuItem key={regional.id} value={regional.id}>
+                                                {regional.nombre}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </Box>
-
-
 
                         </Box>
                     </Box>
@@ -154,23 +180,99 @@ export const FormAreas = () => {
                     </button>
 
                     {message && (
-                        <Alert
-                            severity={message.severity}
-                            sx={{ mt: 2 }}
-                        >
+                        <Alert severity={message.type} sx={{ mt: 2 }}>
                             {message.text}
                         </Alert>
                     )}
                 </FormControl>
             </form>
         </>
-    )    
+    )
+}
+
+// Formulario Cargos
+
+export const FormCargos = () => {
+    const [formData, setFormData] = useState({
+        nombre: '',
+    })
+    const { data, loading, error, nuevo_cargo } = useCreateCargo();
+    const [message, setMessage] = useState(null);
+
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setFormData({ ...formData, [id]: value });
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            // Excluimos el `id` al enviar los datos
+            const { id, ...dataToSend } = formData;
+
+            console.log('Datos a enviar:', dataToSend);  // Verificar los datos enviados
+
+            await nuevo_cargo(dataToSend);  // Enviar datos sin `id`
+            setMessage({ text: 'Cargo creada exitosamente', type: 'success' });
+        } catch (error) {
+            console.error("Error al crear el Cargo:", error);
+            setMessage({ text: 'Ups! Algo salió mal', type: 'error' });
+        }
+    }
+
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => {
+                setMessage(null)
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+
+    }, [message])
+
+
+    return (
+
+        <>
+            <form onSubmit={handleSubmit}>
+                <FormControl sx={{ display: 'flex' }} >
+                    <Box>
+                        <Typography variant="h6" align="center">
+                            Datos del nuevo Cargo
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+
+                            <Box >
+                                <TextField id="nombre" label="nombre" variant="outlined" onChange={handleChange} value={formData.nombre} sx={{ minWidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
+                            </Box>
+
+                        </Box>
+                    </Box>
+
+                    <button type='submit'>
+                        {loading ? 'Enviando...' : 'Enviar'}
+                    </button>
+
+                    {message && (
+                        <Alert severity={message.type} sx={{ mt: 2 }}>
+                            {message.text}
+                        </Alert>
+                    )}
+                </FormControl>
+            </form>
+        </>
+    )
 }
 
 
-
 //Formulario Usuario
+
 export const FormUsuario = () => {
+    const { data: areas, loading: loadingAreas } = useGetAreas();
+    const { data: cargos, loading: loadingCargos } = useGetCargos();
+    const { data: regionales, loading: loadingRegionales } = useGetRegional();
+
     const [formData, setFormData] = useState({
         doc: '',
         nombres: '',
@@ -178,7 +280,6 @@ export const FormUsuario = () => {
         telefono: '',
         id_cargo: '',
         id_regional: '',
-        id_firma: '',
         id_area: ''
     })
 
@@ -186,24 +287,22 @@ export const FormUsuario = () => {
     const [message, setMessage] = useState(null);
 
     const handleChange = (e) => {
-        const { id, value } = e.target;
-        setFormData({ ...formData, [id]: value })
-    }
+        const { id, name, value } = e.target;
+        setFormData({ ...formData, [id || name]: value });
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         try {
             await nuevoUser(formData);
-            setMessage({ text: 'Usuario creado exitosamente', type: 'error' })
+            setMessage({ text: 'Usuario creado exitosamente', type: 'success' })
 
         } catch (error) {
             console.error("error0", error)
             setMessage({ text: 'Ups! Algo salió mal', type: 'error' });
         }
     }
-
-
 
     useEffect(() => {
         if (message) {
@@ -226,19 +325,18 @@ export const FormUsuario = () => {
                         <Typography variant="h6" align="center">
                             Información Personal
                         </Typography>
-                        <Box sx={{ display: 'flex' }}>
+                        <Box sx={{ display: { md: 'flex', sm: 'column' } }}>
 
-                            <Box>
-                                <TextField id="doc" label="Documento" variant="outlined" onChange={handleChange} value={formData.doc} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
+                            <Box sx={{ width: 'auto', padding: { md: ' 0 1rem' } }}>
+                                <TextField id="doc" label="Documento" variant="outlined" onChange={handleChange} value={formData.doc} sx={{ minWidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
 
-                                <TextField id="nombres" label="Nombres" variant="outlined" onChange={handleChange} value={formData.nombres} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
+                                <TextField id="nombres" label="Nombres" variant="outlined" onChange={handleChange} value={formData.nombres} sx={{ minWidth: '100%', margin: '0.5rem 0', }} />
                             </Box>
                             <Box>
 
+                                <TextField id="apellidos" label="Apellidos" variant="outlined" onChange={handleChange} value={formData.apellidos} sx={{ minWidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
 
-                                <TextField id="apellidos" label="Apellidos" variant="outlined" onChange={handleChange} value={formData.apellidos} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
-
-                                <TextField id="telefono" label="Telefono" variant="outlined" onChange={handleChange} value={formData.telefono} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
+                                <TextField id="telefono" label="Telefono" variant="outlined" onChange={handleChange} value={formData.telefono} sx={{ minWidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
 
                             </Box>
 
@@ -248,36 +346,49 @@ export const FormUsuario = () => {
                             Información Empresarial
                         </Typography>
                         <Box sx={{ display: 'flex' }}>
-                            <Box>
 
-                                <TextField id="id_cargo" label="Cargo" variant="outlined" onChange={handleChange} value={formData.id_cargo} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
+                            <FormControl fullWidth>
+                                <InputLabel id="area-label">Área</InputLabel>
+                                <Select labelId="area-label" name="id_area" onChange={handleChange} value={formData.id_area || ''}>
+                                    {areas.map((area) => (
+                                        <MenuItem key={area.id} value={area.id}>
+                                            {area.nombre}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
 
+                            <FormControl fullWidth>
+                                <InputLabel id="cargo-label">Cargo</InputLabel>
+                                <Select labelId="cargo-label" name="id_cargo" onChange={handleChange} value={formData.id_cargo}>
+                                    {cargos.map((cargo) => (
+                                        <MenuItem key={cargo.id} value={cargo.id}>
+                                            {cargo.nombre}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
 
-                                <TextField id="id_regional" label="Regional" variant="outlined" onChange={handleChange} value={formData.id_regional} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
-                            </Box>
-
-                            <Box >
-                                <TextField id="id_area" label="Area" variant="outlined" onChange={handleChange} value={formData.id_area} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
-
-                                <TextField id="id_firma" label="Firma" variant="outlined" onChange={handleChange} value={formData.id_firma} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0' }} />
-                            </Box>
+                            <FormControl fullWidth>
+                                <InputLabel id="regional-label">Regional</InputLabel>
+                                <Select labelId="regional-label" name="id_regional" onChange={handleChange} value={formData.id_regional}>
+                                    {regionales.map((regional) => (
+                                        <MenuItem key={regional.id} value={regional.id}>
+                                            {regional.nombre}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
 
                         </Box>
                     </Box>
-
-
-
-
 
                     <button type='submit'>
                         {loading ? 'Enviando...' : 'Enviar'}
                     </button>
 
                     {message && (
-                        <Alert
-                            severity={message.severity}
-                            sx={{ mt: 2 }}
-                        >
+                        <Alert severity={message.type} sx={{ mt: 2 }}>
                             {message.text}
                         </Alert>
                     )}
@@ -316,7 +427,7 @@ export const FormCelulares = () => {
 
         try {
             await nuevoElemento(formData);
-            setMessage({ text: 'Elemento creado exitosamente', type: 'error' })
+            setMessage({ text: 'Elemento creado exitosamente', type: 'success' })
 
         } catch (error) {
             console.error("error0", error)
@@ -358,17 +469,14 @@ export const FormCelulares = () => {
 
                     <TextField id="disponibilidad" label="Tipo de Elemento" variant="outlined" onChange={handleChange} value={formData.disponibilidad} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0', display: 'none' }} />
 
-                    <TextField id="id_tipo_elemento" label="Tipo de Elemento" variant="outlined" onChange={handleChange} value={formData.id_tipo_elemento} sx={{ minwidth: '100%', margin: '0.5rem 0 0.5rem 0', display: 'none' }} />
+                    <TextField id="id_tipo_elemento" label="Tipo de Elemento" variant="outlined" onChange={handleChange} value={formData.id_tipo_elemento} sx={{ minidth: '100%', margin: '0.5rem 0 0.5rem 0', display: 'none' }} />
 
                     <button type='submit'>
                         {loading ? 'Enviando...' : 'Enviar'}
                     </button>
 
                     {message && (
-                        <Alert
-                            severity={message.severity}
-                            sx={{ mt: 2 }}
-                        >
+                        <Alert severity={message.type} sx={{ mt: 2 }}>
                             {message.text}
                         </Alert>
                     )}
@@ -455,10 +563,7 @@ export const FormLaptops = () => {
             </form>
 
             {message && (
-                <Alert
-                    severity={message.severity}
-                    sx={{ mt: 2 }}
-                >
+                <Alert severity={message.type} sx={{ mt: 2 }}>
                     {message.text}
                 </Alert>
             )}

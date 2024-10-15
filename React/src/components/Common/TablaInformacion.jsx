@@ -10,7 +10,6 @@ import Paper from '@mui/material/Paper';
 import { useState } from 'react';
 import CardModal from './CardModal';
 
-
 //Botones
 import { BotonError, BotonSuccess } from '../Button';
 
@@ -18,16 +17,19 @@ import { BotonError, BotonSuccess } from '../Button';
 import DeleteIcono from '../Icons/Detele';
 import VistaIcon from '../Icons/Vista';
 import UpdateIcon from '../Icons/Update';
-import { swalEliminar } from '../Swal';
 
 
-export default function TablaInformacion({ rows, idKey, columna1, columna2, columna3, columna4, columna5 }) {
+export default function TablaInformacion({
+    rows,
+    idKey,
+    columnas, // Ahora pasamos las columnas como un array
+    eliminarFila
+}) {
 
     const [open, setOpen] = useState(false)
     const [selectedElement, setSelectedElement] = useState(null)
 
     const handleopen = (row) => {
-        console.log(row)
         setSelectedElement(row)
         setOpen(true)
     };
@@ -37,51 +39,35 @@ export default function TablaInformacion({ rows, idKey, columna1, columna2, colu
         setSelectedElement(null)
     }
 
+
     if (!rows) return <div>Loading...</div>;
+    if (rows <= 0) return <div>No hay usuarios para mostrar</div>;
 
     return (
-
         <>
-
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
-
                     <TableHead sx={{ backgroundColor: '#f3f4f7' }}>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold' }} align="center" variant="h6" >{columna1}</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }} align="center" variant="h6" >{columna2}</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }} align="center" variant="h6" >{columna3}</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }} align="center" variant="h6" >{columna4}</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }} align="center" variant="h6" >{columna5}</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }} align="center" variant="h6" >Configuración</TableCell>
+                            {columnas.map((col, index) => (
+                                <TableCell key={index} sx={{ fontWeight: 'bold' }} align="center">
+                                    {col.titulo}
+                                </TableCell>
+                            ))}
+                            <TableCell sx={{ fontWeight: 'bold' }} align="center">Configuración</TableCell>
                         </TableRow>
                     </TableHead>
 
                     <TableBody>
                         {rows.map((row, index) => (
-                            <TableRow
-                                key={row[idKey] || index} // Usa un identificador único si está disponible, de lo contrario usa el índice
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
+                            <TableRow key={row[idKey] || index}>
+                                {columnas.map((col, i) => (
+                                    <TableCell key={i} align="center">
+                                        {row[col.campo]}
+                                    </TableCell>
+                                ))}
 
-                                <TableCell align="center" component="th" scope="row" >
-                                    {row.doc}
-                                </TableCell>
-                                <TableCell align="center" component="th" scope="row" >
-                                    {row.nombres} {row.apellidos}
-                                </TableCell>
-
-                                <TableCell align="center" component="th" scope="row">
-                                    {row.cargo}
-                                </TableCell>
-                                <TableCell align="center" component="th" scope="row">
-                                    {row.area}
-                                </TableCell>
-                                <TableCell align="center" component="th" scope="row">
-                                    {row.regional}
-                                </TableCell>
-
-                                <TableCell align="center" sx={{ display: 'flex', justifyContent:'center'}}>
+                                <TableCell align="center" sx={{ display: 'flex', justifyContent: 'center' }}>
                                     <Box>
                                         <BotonError
                                             mensaje={<UpdateIcon />}
@@ -99,27 +85,24 @@ export default function TablaInformacion({ rows, idKey, columna1, columna2, colu
                                     <Box>
                                         <BotonError
                                             mensaje={<DeleteIcono />}
-                                            onClick={() => swalEliminar({children:"Seguro que quiere eliminar "})}
+                                            onClick={() => eliminarFila(row[idKey])}
                                         />
                                     </Box>
-
-
                                 </TableCell>
-
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+
+
+            {/* Detalle de las filas */}
             <CardModal
                 open={open}
                 handleClose={handleClose}
                 title={selectedElement ? `${selectedElement.nombres} ${selectedElement.apellidos}` : ''}
-                content={selectedElement ? `Detalles del elemento ${selectedElement.doc}` : ''}
+                content={selectedElement ? `Detalles del elemento ${selectedElement[idKey]}` : ''}
             />
-
-
         </>
-
     );
 }

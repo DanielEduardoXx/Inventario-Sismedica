@@ -13,7 +13,7 @@ const StyledCard = styled(Card)(({ theme, bgColor }) => ({
     },
 }));
 
-function    CardElementos({ data, imagen, serial, id_tipo_elemento, disponibilidad }) {
+function CardElementos({ data, imagen, serial, id_tipo_elemento, disponibilidad }) {
 
     if (!data) return <div>Loading...</div>;
     if (data.error) return <div>Error: {data.error.message}</div>;
@@ -65,27 +65,27 @@ function    CardElementos({ data, imagen, serial, id_tipo_elemento, disponibilid
     return (
         <>
             <Grid container spacing={3}>
-                {data.map((element) => {
-                    // Determina el color de fondo basado en la disponibilidad
-                    const bgDisponibilidad = element.disponibilidad === 1 ? '#7DDA58' : '#FF4647';
+                {Array.isArray(data) && data.length > 0 ? (
+                    data.map((element) => {
+                        const bgDisponibilidad = element.disponibilidad === 1 ? '#7DDA58' : '#FF4647';
 
-                    return (
-                        <Grid item xs={'auto'} sm={'auto'} md={'auto'} key={element[serial]}>
-                            <StyledCard >
-                                <CardHeader
-                                    title={element[serial]}
-                                    sx={{ backgroundColor: '#f3f4f7' }}
-                                />
-                                <CardContent style={{ padding: 20, textAlign: 'center' }} onClick={() => handleOpen(element)}>
-                                    {imagen}
-                                    <TbPointFilled style={{ color: bgDisponibilidad, fontSize: '24px' }} />
-
-                                </CardContent>
-                            </StyledCard>
-                        </Grid>
-                    );
-                })}
+                        return (
+                            <Grid item xs={'auto'} sm={'auto'} md={'auto'} key={element[serial]}>
+                                <StyledCard>
+                                    <CardHeader title={element[serial]} sx={{ backgroundColor: '#f3f4f7' }} />
+                                    <CardContent style={{ padding: 20, textAlign: 'center' }} onClick={() => handleOpen(element)}>
+                                        {imagen}
+                                        <TbPointFilled style={{ color: bgDisponibilidad, fontSize: '24px' }} />
+                                    </CardContent>
+                                </StyledCard>
+                            </Grid>
+                        );
+                    })
+                ) : (
+                <p>No data available</p>
+                )}
             </Grid>
+
             <CardModal
                 open={open}
                 handleClose={handleClose}
