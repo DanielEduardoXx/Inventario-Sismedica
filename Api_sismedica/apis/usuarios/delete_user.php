@@ -5,6 +5,12 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 require_once("../../includes/Usuarios.class.php");
 
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    // Si es una solicitud preflight (OPTIONS), responde con 200 OK
+    header('HTTP/1.1 200 OK');
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD']== 'DELETE') {
 
     $input = json_decode(file_get_contents("php://input"), true);

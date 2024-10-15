@@ -5,16 +5,17 @@ header("Access-Control-Allow-Headers: Content-Type");
 
     require_once('../../includes/Cargo.class.php');
 
+    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+        exit;
+    }
+
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $input = json_decode(file_get_contents("php://input"), true);
 
         if(
-
-            isset($input['id'])&&
             isset($input['nombre'])
         ){
             Cargo::create_cargo(
-                $input['id'],
                 $input['nombre']
             );
         }else {
