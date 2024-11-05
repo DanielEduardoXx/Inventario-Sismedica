@@ -105,6 +105,24 @@ class Entregas
         }
     }
 
+    public static function get_entrega_user($id_doc)
+    {
+        $database = new DataBase();
+        $conn = $database->getConnection();
+
+        $stmt = $conn->prepare("SELECT * from entregas where id_doc = :id_doc");
+        $stmt->bindParam(":id_doc", $id_doc);
+
+        if ($stmt->execute()) {
+            $resultado = $stmt->fetchAll();
+            header('HTTP/1.1 201 entregaso Listado correctamente');
+            echo json_encode($resultado);
+
+        } else {
+            header('HTTP/1.1 500 entregaso no Listado correctamente');
+        }
+    }
+
     public static function update_entregas($id, $observaciones, $fecha_entrega, $estado, $id_serial_elemento, $id_doc)
     {
         $database = new DataBase();

@@ -56,7 +56,22 @@ class Users
         $conexion = new DataBase();
         $conn = $conexion->getConnection();
 
-        $stmt = $conn->prepare('SELECT * FROM usuarios');
+        // $stmt = $conn->prepare('SELECT * FROM usuarios');
+        $stmt = $conn->prepare('SELECT
+	usuarios.doc,
+    usuarios.nombres as nombres_usuario,
+    usuarios.apellidos as apellidos_usuario,
+    usuarios.telefono,
+    cargo.nombre as nombre_cargo,
+    regional.nombre as nombre_regional,
+    areas.nombre as nombre_area
+    
+    From usuarios
+    
+    Join cargo on usuarios.id_cargo = cargo.id
+    join areas on usuarios.id_area = areas.id
+    join regional on usuarios.id_regional = regional.id;
+	');
 
 
         if ($stmt->execute()) {
