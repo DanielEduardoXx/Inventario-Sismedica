@@ -38,7 +38,7 @@ export const BotonError = ({ mensaje, onClick }) => {
 };
 
 
-export const BotonVista = ({ mensaje, onClick }) => {
+export const BotonDetail = ({ mensaje, onClick }) => {
     return (
 
         <Box sx={{ marginRight: "10px" }}>

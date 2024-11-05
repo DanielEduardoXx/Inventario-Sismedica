@@ -92,7 +92,6 @@ function Areas() {
               rows={rows}
               idKey={"id"}
               columnas={[
-                { titulo: "ID", campo: "id" },
                 { titulo: "Nombres", campo: "nombre" },
               ]}
               eliminarFila={eliminarArea}

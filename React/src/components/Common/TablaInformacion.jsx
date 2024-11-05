@@ -11,7 +11,7 @@ import { useState } from 'react';
 import CardModal from './CardModal';
 
 //Botones
-import { BotonError, BotonSuccess } from '../Button';
+import { BotonError, BotonSuccess, BotonDetail } from '../Button';
 
 //iconos
 import DeleteIcono from '../Icons/Detele';
@@ -33,6 +33,11 @@ export default function TablaInformacion({
         setSelectedElement(row)
         setOpen(true)
     };
+
+    const handleOpenDetail = (row) => {
+        setSelectedElement(row)
+        setOpen(true)
+    }
 
     const handleClose = () => {
         setOpen(false)
@@ -76,9 +81,9 @@ export default function TablaInformacion({
                                     </Box>
 
                                     <Box>
-                                        <BotonError
+                                        <BotonDetail
                                             mensaje={<VistaIcon />}
-                                            onClick={() => handleopen(row)}
+                                            onClick={() => handleOpenDetail(row)}
                                         />
                                     </Box>
 

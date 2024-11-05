@@ -91,7 +91,6 @@ function Cargos() {
               rows={rows}
               idKey={"id"}
               columnas={[
-                { titulo: "Id", campo: "id" },
                 { titulo: "Nombre", campo: "nombre" },
 
               ]}

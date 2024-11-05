@@ -66,11 +66,11 @@ const eliminarUsuario = async (doc) => {
   // Prepara los datos en el formato requerido por la tabla
   const rows = usuarios.map(item => ({
     doc: item.doc,
-    nombres: item.nombres,
-    apellidos: item.apellidos,
-    cargo: item.id_cargo,
-    regional: item.id_regional,
-    area: item.id_area,
+    nombres: item.nombres_usuario,
+    apellidos: item.apellidos_usuario,
+    cargo: item.nombre_area,
+    regional: item.nombre_regional,
+    area: item.nombre_area,
   }));
 
 
